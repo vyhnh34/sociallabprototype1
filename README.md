@@ -4,6 +4,11 @@ A faithful recreation of the Claude chat **composer** (the input field), with a
 minimal chat area around it — built in **React + Vite** as a base for
 interaction experiments.
 
+## Project context
+
+- `PROJECT.md` contains the product and interaction design brief.
+- `AGENTS.md` contains collaboration instructions for coding agents.
+
 ## Run it
 
 ```bash
