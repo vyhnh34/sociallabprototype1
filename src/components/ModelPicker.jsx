@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { MODELS } from '../data.js'
 import { Chevron, Check } from './icons.jsx'
 
 // The model selector button + dropdown menu.
-export default function ModelPicker({ model, onChange }) {
+export default function ModelPicker({ model, models, onChange, productName = 'Claude', productTheme = 'claude' }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
-  const current = MODELS.find((m) => m.id === model)
+  const isChatGPT = productTheme === 'chatgpt'
+  const current = models.find((m) => m.id === model) ?? models[0]
 
   // Close on outside click.
   useEffect(() => {
@@ -17,29 +17,45 @@ export default function ModelPicker({ model, onChange }) {
   }, [open])
 
   return (
-    <div className="model-field" ref={ref}>
+    <div className={`model-field${isChatGPT ? ' openai-model-field' : ''}`} ref={ref}>
       <button
         type="button"
-        className="model"
+        className={`model${isChatGPT ? ' openai-model' : ''}`}
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <span><span className="label-full">Claude </span>{current?.name}</span>
+        <span>
+          {!isChatGPT && <span className="label-full">{productName} </span>}
+          {current?.name}
+        </span>
         <Chevron className="chev" />
       </button>
 
       {open && (
-        <div className="menu" role="menu">
-          {MODELS.map((m) => (
+        <div className={`menu${isChatGPT ? ' openai-model-menu' : ''}`} role="menu">
+          {isChatGPT && (
+            <div className="openai-menu-head">
+              <span>Model</span>
+              <small>Choose how ChatGPT should respond</small>
+            </div>
+          )}
+
+          {models.map((m) => (
             <button
               key={m.id}
-              className={`item${m.id === model ? ' checked' : ''}`}
+              className={`item${m.id === current?.id ? ' checked' : ''}`}
               role="menuitemradio"
-              aria-checked={m.id === model}
+              aria-checked={m.id === current?.id}
               onClick={() => { onChange(m.id); setOpen(false) }}
             >
-              <span>{m.name}<small>{m.note}</small></span>
+              <span>
+                <span className="model-row-title">
+                  {m.name}
+                  {isChatGPT && m.badge && <em>{m.badge}</em>}
+                </span>
+                <small>{m.note}</small>
+              </span>
               <Check className="check" />
             </button>
           ))}

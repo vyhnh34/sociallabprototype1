@@ -1,0 +1,103 @@
+import { useEffect, useRef, useState } from 'react'
+import { Check, Moon, Settings, Sun } from './icons.jsx'
+
+const PRODUCT_THEMES = [
+  { id: 'claude', label: 'Claude' },
+  { id: 'chatgpt', label: 'ChatGPT' },
+]
+
+const COLOR_MODES = [
+  { id: 'light', label: 'Light', Icon: Sun },
+  { id: 'dark', label: 'Dark', Icon: Moon },
+]
+
+const TOOL_CONTROLS = [
+  { id: 'agentation', label: 'Agentation' },
+  { id: 'interfaceKit', label: 'Interface Kit' },
+]
+
+export default function ThemeControl({
+  productTheme,
+  colorMode,
+  tools,
+  onProductThemeChange,
+  onColorModeChange,
+  onToolChange,
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDoc = (e) => { if (!ref.current?.contains(e.target)) setOpen(false) }
+    document.addEventListener('click', onDoc)
+    return () => document.removeEventListener('click', onDoc)
+  }, [open])
+
+  return (
+    <div className="theme-control" ref={ref}>
+      {open && (
+        <div className="theme-panel" role="menu" aria-label="Design controls">
+          <section className="theme-section" aria-label="Product theme">
+            <p className="theme-section-title">Theme</p>
+            <div className="theme-segmented" role="group" aria-label="Product theme">
+              {PRODUCT_THEMES.map((theme) => (
+                <button
+                  key={theme.id}
+                  type="button"
+                  className={`theme-segment${theme.id === productTheme ? ' selected' : ''}`}
+                  onClick={() => onProductThemeChange(theme.id)}
+                >
+                  {theme.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="theme-section" aria-label="Color mode">
+            <p className="theme-section-title">Mode</p>
+            <div className="theme-segmented" role="group" aria-label="Color mode">
+              {COLOR_MODES.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`theme-segment${id === colorMode ? ' selected' : ''}`}
+                  onClick={() => onColorModeChange(id)}
+                >
+                  <span className="theme-option-label"><Icon />{label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="theme-section" aria-label="Design tools">
+            <p className="theme-section-title">Tools</p>
+            <div className="theme-options">
+              {TOOL_CONTROLS.map((tool) => (
+                <button
+                  key={tool.id}
+                  type="button"
+                  className={`theme-option${tools[tool.id] ? ' selected' : ''}`}
+                  onClick={() => onToolChange(tool.id, !tools[tool.id])}
+                >
+                  <span>{tool.label}</span>
+                  <Check className="theme-check" />
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      <button
+        type="button"
+        className={`theme-trigger${open ? ' active' : ''}`}
+        aria-label="Open design controls"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <Settings />
+      </button>
+    </div>
+  )
+}

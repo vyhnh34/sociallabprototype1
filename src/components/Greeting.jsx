@@ -1,10 +1,12 @@
-import { Spark } from './icons.jsx'
+import { ChatGPTMark, Spark } from './icons.jsx'
 
 // The "new chat" welcome: spark logo + serif greeting.
-export default function Greeting({ text = 'How can I help you today?' }) {
+export default function Greeting({ productTheme = 'claude', text = 'How can I help you today?' }) {
+  const Mark = productTheme === 'chatgpt' ? ChatGPTMark : Spark
+
   return (
     <section className="greeting">
-      <Spark className="spark-lg" />
+      <Mark className="spark-lg" />
       <h1>{text}</h1>
     </section>
   )
