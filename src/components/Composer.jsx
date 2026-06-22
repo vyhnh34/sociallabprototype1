@@ -31,6 +31,7 @@ export default function Composer({
   onModelChange,
   onSend,
   onPrivacyChange,
+  privacyEnabled = false,
   placeholder = 'How can I help you today?',
   productName = 'Claude',
   productTheme = 'claude',
@@ -54,16 +55,17 @@ export default function Composer({
     ta.style.height = Math.min(ta.scrollHeight, 220) + 'px'
   }, [text])
 
-  // Run (debounced) analysis whenever the draft changes.
+  // Run (debounced) analysis whenever the draft changes — only when the
+  // active version uses it. The template version skips analysis entirely.
   useEffect(() => {
-    if (!text.trim()) { setStatus('idle'); setResult(null); return }
+    if (!privacyEnabled || !text.trim()) { setStatus('idle'); setResult(null); return }
     setStatus('analyzing')
     const id = setTimeout(() => {
       setResult(analyze(text))
       setStatus('ready')
     }, 800)
     return () => clearTimeout(id)
-  }, [text])
+  }, [text, privacyEnabled])
 
   // Report status + result upward so the privacy nudge can render it.
   useEffect(() => { onPrivacyChange?.({ status, analysis: result }) }, [status, result, onPrivacyChange])

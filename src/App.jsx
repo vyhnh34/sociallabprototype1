@@ -6,6 +6,7 @@ import PrivacyNudge from './components/PrivacyNudge.jsx'
 import ThemeControl from './components/ThemeControl.jsx'
 import { ChatGPTMark, Spark } from './components/icons.jsx'
 import { DEFAULT_MODEL, DEFAULT_MODELS, MODEL_GROUPS, respond } from './data.js'
+import { DEFAULT_VERSION } from './versions.js'
 
 const AgentationTool = lazy(() => import('agentation').then((module) => ({ default: module.Agentation })))
 const InterfaceKitTool = lazy(() => import('interface-kit/react').then((module) => ({ default: module.InterfaceKit })))
@@ -20,6 +21,8 @@ export default function App() {
     interfaceKit: false,
   })
   const [privacy, setPrivacy] = useState({ status: 'idle', analysis: null }) // debounced privacy state
+  const [version, setVersion] = useState(DEFAULT_VERSION) // which interaction is active
+  const privacyEnabled = version === 'privacy-grade'
   const mainRef = useRef(null)
   const idRef = useRef(0)
 
@@ -131,6 +134,7 @@ export default function App() {
               placeholder={placeholder}
               productName={productName}
               productTheme={productTheme}
+              privacyEnabled={privacyEnabled}
               onPrivacyChange={setPrivacy}
               onAttach={() => console.log('[attach] open file picker')}
             />
@@ -141,12 +145,14 @@ export default function App() {
         </div>
       </main>
 
-      <PrivacyNudge status={privacy.status} analysis={privacy.analysis} />
+      {privacyEnabled && <PrivacyNudge status={privacy.status} analysis={privacy.analysis} />}
 
       <ThemeControl
+        version={version}
         productTheme={productTheme}
         colorMode={colorMode}
         tools={tools}
+        onVersionChange={setVersion}
         onProductThemeChange={setProductTheme}
         onColorModeChange={setColorMode}
         onToolChange={handleToolChange}

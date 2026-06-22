@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, Moon, Settings, Sun } from './icons.jsx'
+import { VERSIONS } from '../versions.js'
 
 const PRODUCT_THEMES = [
   { id: 'claude', label: 'Claude' },
@@ -17,9 +18,11 @@ const TOOL_CONTROLS = [
 ]
 
 export default function ThemeControl({
+  version,
   productTheme,
   colorMode,
   tools,
+  onVersionChange,
   onProductThemeChange,
   onColorModeChange,
   onToolChange,
@@ -38,6 +41,23 @@ export default function ThemeControl({
     <div className="theme-control" ref={ref}>
       {open && (
         <div className="theme-panel" role="menu" aria-label="Design controls">
+          <section className="theme-section" aria-label="Interaction version">
+            <p className="theme-section-title">Version</p>
+            <div className="theme-options">
+              {VERSIONS.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  className={`theme-option${v.id === version ? ' selected' : ''}`}
+                  onClick={() => onVersionChange(v.id)}
+                >
+                  <span>{v.label}</span>
+                  <Check className="theme-check" />
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="theme-section" aria-label="Product theme">
             <p className="theme-section-title">Theme</p>
             <div className="theme-segmented" role="group" aria-label="Product theme">

@@ -9,6 +9,19 @@ interaction experiments.
 - `PROJECT.md` contains the product and interaction design brief.
 - `AGENTS.md` contains collaboration instructions for coding agents.
 
+## Versions
+
+Each interaction experiment is a **version** you switch between live from the
+gear panel (bottom-left) → **Version** — no branches to juggle:
+
+- **Template** — the clean base composer, no extra interaction.
+- **Privacy grade** — live privacy grading: highlights personal details in the
+  draft and shows a gentle A–F grade nudge top-right.
+
+To add a new version: add an entry to `src/versions.js`, then gate its
+behaviour on `version === '<your-id>'` in `App.jsx` / `Composer.jsx`. The
+default version is set by `DEFAULT_VERSION` in `src/versions.js`.
+
 ## Run it
 
 ```bash
