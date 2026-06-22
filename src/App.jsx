@@ -3,6 +3,7 @@ import Greeting from './components/Greeting.jsx'
 import Message from './components/Message.jsx'
 import Composer from './components/Composer.jsx'
 import PrivacyNudge from './components/PrivacyNudge.jsx'
+import PrivacySheet from './components/PrivacySheet.jsx'
 import ThemeControl from './components/ThemeControl.jsx'
 import { ChatGPTMark, Spark } from './components/icons.jsx'
 import { DEFAULT_MODEL, DEFAULT_MODELS, MODEL_GROUPS, respond } from './data.js'
@@ -22,7 +23,9 @@ export default function App() {
   })
   const [privacy, setPrivacy] = useState({ status: 'idle', analysis: null }) // debounced privacy state
   const [version, setVersion] = useState(DEFAULT_VERSION) // which interaction is active
-  const privacyEnabled = version === 'privacy-grade'
+  const [detailsOpen, setDetailsOpen] = useState(false) // mobile privacy sheet
+  const privacyEnabled = version.startsWith('privacy') // privacy-grade | privacy-color
+  const showLetter = version === 'privacy-grade'        // color-only variant hides the letter
   const mainRef = useRef(null)
   const idRef = useRef(0)
 
@@ -33,6 +36,9 @@ export default function App() {
   const greetingText = productTheme === 'chatgpt' ? "What's on the agenda today?" : 'How can I help you today?'
   const placeholder = isConversation ? `Reply to ${productName}...` : `Message ${productName}`
   const modelOptions = MODEL_GROUPS[productTheme]
+
+  // Close the mobile details sheet once the draft (and its analysis) clears.
+  useEffect(() => { if (privacy.status === 'idle') setDetailsOpen(false) }, [privacy.status])
 
   // Apply appearance settings to <html> so the CSS tokens switch.
   useEffect(() => {
@@ -135,7 +141,9 @@ export default function App() {
               productName={productName}
               productTheme={productTheme}
               privacyEnabled={privacyEnabled}
+              showLetter={showLetter}
               onPrivacyChange={setPrivacy}
+              onOpenDetails={() => setDetailsOpen(true)}
               onAttach={() => console.log('[attach] open file picker')}
             />
             {!isConversation && (
@@ -145,7 +153,16 @@ export default function App() {
         </div>
       </main>
 
-      {privacyEnabled && <PrivacyNudge status={privacy.status} analysis={privacy.analysis} />}
+      {privacyEnabled && <PrivacyNudge status={privacy.status} analysis={privacy.analysis} showLetter={showLetter} />}
+      {privacyEnabled && (
+        <PrivacySheet
+          open={detailsOpen}
+          status={privacy.status}
+          analysis={privacy.analysis}
+          showLetter={showLetter}
+          onClose={() => setDetailsOpen(false)}
+        />
+      )}
 
       <ThemeControl
         version={version}

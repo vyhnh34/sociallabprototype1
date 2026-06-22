@@ -31,7 +31,9 @@ export default function Composer({
   onModelChange,
   onSend,
   onPrivacyChange,
+  onOpenDetails,
   privacyEnabled = false,
+  showLetter = true,
   placeholder = 'How can I help you today?',
   productName = 'Claude',
   productTheme = 'claude',
@@ -112,11 +114,25 @@ export default function Composer({
       </div>
 
       <div className="toolbar">
-        {/* Left: attach */}
+        {/* Left: attach + (mobile only) the privacy grade chip */}
         <div className="group">
           <button type="button" className="tool circle" title="Attach" aria-label="Attach" onClick={onAttach}>
             <Plus />
           </button>
+
+          {privacyEnabled && status !== 'idle' && (
+            <button
+              type="button"
+              className={`grade-chip${status === 'ready' && !showLetter ? ' grade-chip--dot' : ''}`}
+              onClick={onOpenDetails}
+              aria-label="Show privacy details"
+              style={status === 'ready' && result ? { background: result.color } : undefined}
+            >
+              {status === 'ready' && result
+                ? (showLetter ? result.grade : null)
+                : <span className="grade-chip-spinner" aria-hidden="true" />}
+            </button>
+          )}
         </div>
 
         {/* Right: model picker + send */}
