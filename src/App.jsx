@@ -5,6 +5,7 @@ import Composer from './components/Composer.jsx'
 import PrivacyNudge from './components/PrivacyNudge.jsx'
 import PrivacySheet from './components/PrivacySheet.jsx'
 import ThemeControl from './components/ThemeControl.jsx'
+import OnboardingVersion from './components/OnboardingVersion.jsx'
 import { ChatGPTMark, Spark } from './components/icons.jsx'
 import { DEFAULT_MODEL, DEFAULT_MODELS, MODEL_GROUPS, respond } from './data.js'
 import { DEFAULT_VERSION } from './versions.js'
@@ -23,6 +24,8 @@ export default function App() {
   })
   const [privacy, setPrivacy] = useState({ status: 'idle', analysis: null }) // debounced privacy state
   const [version, setVersion] = useState(DEFAULT_VERSION) // which interaction is active
+  const [onboardingView, setOnboardingView] = useState('mobile')
+  const [s2variant, setS2variant] = useState('A')
   const [detailsOpen, setDetailsOpen] = useState(false) // mobile privacy sheet
   const privacyEnabled = version.startsWith('privacy') // privacy-grade | privacy-color
   const showLetter = version === 'privacy-grade'        // color-only variant hides the letter
@@ -106,62 +109,68 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <BrandMark className="spark" style={{ width: 20, height: 20 }} />
-          <span>{productName}</span>
-        </div>
-      </header>
+      {version === 'onboarding' ? (
+        <OnboardingVersion view={onboardingView} dark={colorMode === 'dark'} s2variant={s2variant} />
+      ) : (
+        <>
+          <header className="topbar">
+            <div className="brand">
+              <BrandMark className="spark" style={{ width: 20, height: 20 }} />
+              <span>{productName}</span>
+            </div>
+          </header>
 
-      <main className="main" ref={mainRef}>
-        <div className={`column${isConversation ? '' : ' is-empty'}`}>
-          {!isConversation && <Greeting productTheme={productTheme} text={greetingText} />}
+          <main className="main" ref={mainRef}>
+            <div className={`column${isConversation ? '' : ' is-empty'}`}>
+              {!isConversation && <Greeting productTheme={productTheme} text={greetingText} />}
 
-          {isConversation && (
-            <section className="messages" aria-live="polite">
-              {messages.map((m) => (
-                <Message
-                  key={m.id}
-                  role={m.role}
-                  text={m.text}
-                  productTheme={productTheme}
+              {isConversation && (
+                <section className="messages" aria-live="polite">
+                  {messages.map((m) => (
+                    <Message
+                      key={m.id}
+                      role={m.role}
+                      text={m.text}
+                      productTheme={productTheme}
+                      productName={productName}
+                    />
+                  ))}
+                </section>
+              )}
+
+              <div className={`composer-wrap${isConversation ? ' docked' : ''}`}>
+                <Composer
+                  model={model}
+                  models={modelOptions}
+                  onModelChange={setModel}
+                  onSend={handleSend}
+                  placeholder={placeholder}
                   productName={productName}
+                  productTheme={productTheme}
+                  privacyEnabled={privacyEnabled}
+                  showLetter={showLetter}
+                  onPrivacyChange={setPrivacy}
+                  onOpenDetails={() => setDetailsOpen(true)}
+                  onAttach={() => console.log('[attach] open file picker')}
                 />
-              ))}
-            </section>
-          )}
+                {!isConversation && (
+                  <p className="hint">{productName} can make mistakes. This is a prototype - replies are simulated.</p>
+                )}
+              </div>
+            </div>
+          </main>
 
-          <div className={`composer-wrap${isConversation ? ' docked' : ''}`}>
-            <Composer
-              model={model}
-              models={modelOptions}
-              onModelChange={setModel}
-              onSend={handleSend}
-              placeholder={placeholder}
-              productName={productName}
-              productTheme={productTheme}
-              privacyEnabled={privacyEnabled}
+          {privacyEnabled && <PrivacyNudge status={privacy.status} analysis={privacy.analysis} showLetter={showLetter} />}
+          {privacyEnabled && (
+            <PrivacySheet
+              open={detailsOpen}
+              status={privacy.status}
+              analysis={privacy.analysis}
               showLetter={showLetter}
-              onPrivacyChange={setPrivacy}
-              onOpenDetails={() => setDetailsOpen(true)}
-              onAttach={() => console.log('[attach] open file picker')}
+              onClose={() => setDetailsOpen(false)}
             />
-            {!isConversation && (
-              <p className="hint">{productName} can make mistakes. This is a prototype - replies are simulated.</p>
-            )}
-          </div>
-        </div>
-      </main>
-
-      {privacyEnabled && <PrivacyNudge status={privacy.status} analysis={privacy.analysis} showLetter={showLetter} />}
-      {privacyEnabled && (
-        <PrivacySheet
-          open={detailsOpen}
-          status={privacy.status}
-          analysis={privacy.analysis}
-          showLetter={showLetter}
-          onClose={() => setDetailsOpen(false)}
-        />
+          )}
+        </>
       )}
 
       <ThemeControl
@@ -169,10 +178,14 @@ export default function App() {
         productTheme={productTheme}
         colorMode={colorMode}
         tools={tools}
+        onboardingView={onboardingView}
+        s2variant={s2variant}
         onVersionChange={setVersion}
         onProductThemeChange={setProductTheme}
         onColorModeChange={setColorMode}
         onToolChange={handleToolChange}
+        onOnboardingViewChange={setOnboardingView}
+        onS2variantChange={setS2variant}
       />
 
       <Suspense fallback={null}>

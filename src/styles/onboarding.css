@@ -1,0 +1,94 @@
+@import 'tailwindcss' source(none);
+@source '../components/Onboarding*.jsx';
+
+/* Bridge CSS vars → Tailwind color utilities */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+}
+
+/* iOS-style theme tokens — scoped so they don't bleed into the chat UI */
+.onboarding-root {
+  --background: #f2f2f7;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --muted: rgba(60, 60, 67, 0.06);
+  --muted-foreground: #6c6c70;
+  --border: rgba(60, 60, 67, 0.18);
+}
+
+/* Phone device frame — shows on tablet, fills screen on mobile and desktop */
+.onboarding-phone-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 390px;
+  height: min(844px, calc(100dvh - 48px));
+  border-radius: 50px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 8px #1c1c1e,
+    0 0 0 9px rgba(255, 255, 255, 0.08),
+    0 32px 72px rgba(0, 0, 0, 0.35);
+}
+
+/* Mobile: fill full screen */
+@media (max-width: 500px) {
+  .onboarding-phone-shell {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .onboarding-root {
+    padding: 0 !important;
+  }
+}
+
+/* Tablet + desktop: expand to fill viewport — no phone frame */
+@media (min-width: 501px) {
+  .onboarding-phone-shell {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .onboarding-root {
+    padding: 0 !important;
+  }
+}
+
+/* Constrain content width on large screens for readability */
+.onboarding-inner {
+  width: 100%;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.onboarding-root.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #1c1c1e;
+  --card-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --muted: rgba(60, 60, 67, 0.25);
+  --muted-foreground: #8d8d93;
+  --border: rgba(255, 255, 255, 0.12);
+}

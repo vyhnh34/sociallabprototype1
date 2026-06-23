@@ -17,15 +17,24 @@ const TOOL_CONTROLS = [
   { id: 'interfaceKit', label: 'Interface Kit' },
 ]
 
+const ONBOARDING_VIEWS = [
+  { id: 'mobile',  label: 'Mobile'  },
+  { id: 'desktop', label: 'Desktop' },
+]
+
 export default function ThemeControl({
   version,
   productTheme,
   colorMode,
   tools,
+  onboardingView,
+  s2variant,
   onVersionChange,
   onProductThemeChange,
   onColorModeChange,
   onToolChange,
+  onOnboardingViewChange,
+  onS2variantChange,
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -57,6 +66,24 @@ export default function ThemeControl({
               ))}
             </div>
           </section>
+
+          {version === 'onboarding' && (
+            <section className="theme-section" aria-label="Screen 2 design variant">
+              <p className="theme-section-title">Design</p>
+              <div className="theme-segmented" role="group" aria-label="Screen 2 design variant">
+                {['A', 'B'].map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`theme-segment${v === s2variant ? ' selected' : ''}`}
+                    onClick={() => onS2variantChange(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="theme-section" aria-label="Product theme">
             <p className="theme-section-title">Theme</p>
